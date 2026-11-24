@@ -5,6 +5,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/theme/app_padding.dart';
+import '../../history/provider/history_provider.dart';
 import '../provider/camera_permission_provider.dart';
 import '../provider/scanner_qr_provider.dart';
 import 'camera_permission_view.dart';
@@ -49,9 +50,20 @@ class _ScannerQrScreenState extends ConsumerState<ScannerQrScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<String?>(scannerQrProvider, (prev, next) async {
-      if (next == null) return;
+    ref.listen<String?>(scannerQrProvider, (prev, data) async {
+      if (data == null) return;
 
+      try {
+        await ref.read(scanHistoryRepositoryProvider).addScanHistory(data);
+      } catch (e, s) {
+        debugPrint('addScanHistory failed: $e\n$s');
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Gagal menyimpan riwayat scan')),
+        );
+      }
+
+      if (!context.mounted) return;
       await showModalBottomSheet(
         context: context,
         showDragHandle: true,
@@ -63,10 +75,10 @@ class _ScannerQrScreenState extends ConsumerState<ScannerQrScreen> {
               mainAxisSize: MainAxisSize.min,
               spacing: AppPadding.sm,
               children: [
-                SelectableText(next),
+                SelectableText(data),
                 ElevatedButton(
                   onPressed: () async {
-                    await Clipboard.setData(ClipboardData(text: next));
+                    await Clipboard.setData(ClipboardData(text: data));
                   },
                   child: const Text('Salin Text'),
                 ),
@@ -77,7 +89,7 @@ class _ScannerQrScreenState extends ConsumerState<ScannerQrScreen> {
       );
 
       // execute after bottomsheet closed
-      if (!mounted) return;
+      if (!context.mounted) return;
 
       // reset state
       ref.read(scannerQrProvider.notifier).resetValue();

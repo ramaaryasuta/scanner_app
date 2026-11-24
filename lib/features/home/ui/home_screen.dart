@@ -12,7 +12,11 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final activeIndex = ref.watch(tabIndexProvider);
 
-    const pages = [GenerateQrScreen(), ScannerQrScreen()];
+    const pages = [
+      GenerateQrScreen(),
+      ScannerQrScreen(),
+      Center(child: Text('History')),
+    ];
 
     return Scaffold(
       body: SafeArea(child: pages[activeIndex]),
@@ -23,12 +27,13 @@ class HomeScreen extends ConsumerWidget {
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.qr_code_2_rounded),
-            label: 'Generate',
+            label: 'My QR',
           ),
           NavigationDestination(
             icon: Icon(Icons.qr_code_scanner_rounded),
             label: 'Scan',
           ),
+          NavigationDestination(icon: Icon(Icons.history), label: 'History'),
         ],
       ),
     );
