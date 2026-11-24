@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../generate/ui/generate_qr_screen.dart';
 import '../provider/home_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -10,13 +11,10 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final activeIndex = ref.watch(tabIndexProvider);
 
-    const pages = [
-      Center(child: Text('Generate')),
-      Center(child: Text('Scan')),
-    ];
+    const pages = [GenerateQrScreen(), Center(child: Text('Scan'))];
 
     return Scaffold(
-      body: pages[activeIndex],
+      body: SafeArea(child: pages[activeIndex]),
       bottomNavigationBar: NavigationBar(
         selectedIndex: activeIndex,
         onDestinationSelected: (value) =>
